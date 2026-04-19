@@ -13,7 +13,7 @@
 -----------------------------------------------------------------------*/
 
 const PLUGIN_NAME = "USweeper";
-const VERSION = [1, 0, 0];
+const VERSION = [1, 0, 1];
 const DIR_PATH = "plugins/" + PLUGIN_NAME;
 const CONFIG_PATH = DIR_PATH + "/config.json";
 
@@ -25,25 +25,39 @@ if (!File.exists(DIR_PATH)) {
 
 const DEFAULT_CONFIG = {
     whitelist:[
+        "minecraft:shulker_box",
         "minecraft:netherite",
+        "minecraft:diamond",
+        "minecraft:ender_dragon",
         "minecraft:ancient_debris",
+        "minecraft:beacon",
         "minecraft:dragon_egg",
         "minecraft:nether_star",
         "minecraft:elytra",
         "minecraft:emerald",
-        "minecraft:beacon",
-        "minecraft:ender_eye",
-        "minecraft:shulker_box",
-        "minecraft:sea_lantern",
-        "minecraft:enchanted_book",
-        "minecraft:diamond",
-        "minecraft:totem_of_undying",
-        "minecraft:ender_pearl",
-        "minecraft:villager",
         "minecraft:ender_crystal",
-        "minecraft:ender_dragon",
+        "minecraft:ender_eye",
+        "minecraft:ender_pearl",
+        "minecraft:enchanted_book",
+        "minecraft:painting",
+        "minecraft:sea_lantern",
+        "minecraft:totem_of_undying",
+        "minecraft:villager",
         "minecraft:villager_v2",
-        "minecraft:painting"
+        "minecraft:chicken",
+        "minecraft:cow",
+        "minecraft:sheep",
+        "minecraft:rabbit",
+        "minecraft:mooshroom",
+        "minecraft:bee",
+        "minecraft:pig",
+        "minecraft:minecart",
+        "minecraft:hopper_minecart",
+        "minecraft:command_block_minecart",
+        "minecraft:chest_minecart",
+        "minecraft:iron_golem",
+        "minecraft:snow_golem",
+        "minecraft:copper_golem"
     ],
     limits: {
         enabled: true,
@@ -71,7 +85,8 @@ const DEFAULT_CONFIG = {
     cleanup: {
         delay: 15,
         warningMark: 5,
-        safetyLockSeconds: 60
+        safetyLockSeconds: 60,
+        ignoreTamedAndTrusted: true
     }
 };
 
@@ -123,6 +138,10 @@ let globalTasks =[];
 function isCleanable(en) {
     if (!en || en.isPlayer()) return false;
 
+    if (config.cleanup.ignoreTamedAndTrusted && en.isTrusting) {
+        return false;
+    }
+
     let typeStr = en.type || "";
     let nameStr = en.name || "";
     for (let w of whitelist) {
@@ -163,9 +182,11 @@ function isCleanable(en) {
         return false;
     }
 
-    if (nbt.getData("IsTamed") === 1) {
-        nbt.destroy();
-        return false;
+    if (config.cleanup.ignoreTamedAndTrusted) {
+        if (nbt.getData("IsTamed") === 1 || nbt.getData("IsTrusting") === 1) {
+            nbt.destroy();
+            return false;
+        }
     }
 
     let mainhand = nbt.getData("Mainhand");
