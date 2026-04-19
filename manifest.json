@@ -1,0 +1,14 @@
+{
+    "entry": "USweeper.js",
+    "name": "USweeper",
+    "type": "lse-quickjs",
+    "version": "1.0.0",
+    "author": "wuw111",
+    "description": "USweeper",
+    "extraInfo": {},
+    "dependencies": [
+        {
+            "name": "legacy-script-engine-quickjs"
+        }
+    ]
+}
