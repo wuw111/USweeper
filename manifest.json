@@ -2,7 +2,7 @@
     "entry": "USweeper.js",
     "name": "USweeper",
     "type": "lse-quickjs",
-    "version": "1.0.0",
+    "version": "1.0.2",
     "author": "wuw111",
     "description": "USweeper",
     "extraInfo": {},

@@ -13,7 +13,7 @@
 -----------------------------------------------------------------------*/
 
 const PLUGIN_NAME = "USweeper";
-const VERSION = [1, 0, 1];
+const VERSION = [1, 0, 2];
 const DIR_PATH = "plugins/" + PLUGIN_NAME;
 const CONFIG_PATH = DIR_PATH + "/config.json";
 
@@ -57,7 +57,21 @@ const DEFAULT_CONFIG = {
         "minecraft:chest_minecart",
         "minecraft:iron_golem",
         "minecraft:snow_golem",
-        "minecraft:copper_golem"
+        "minecraft:copper_golem",
+        "minecraft:boat",
+        "minecraft:chest_boat",
+        "minecraft:armor_stand",
+        "minecraft:cat",
+        "minecraft:wolf",
+        "minecraft:shulker",
+        "minecraft:wither_skeleton",
+        "minecraft:wither",
+        "minecraft:pillager",
+        "minecraft:vindicator",
+        "minecraft:witch",
+        "minecraft:evoker",
+        "minecraft:ravager",
+        "minecraft:allay"
     ],
     limits: {
         enabled: true,
