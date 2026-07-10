@@ -13,7 +13,7 @@
 -----------------------------------------------------------------------*/
 
 const PLUGIN_NAME = "USweeper";
-const VERSION = [1, 0, 2];
+const VERSION = [1, 1, 0]; 
 const DIR_PATH = "plugins/" + PLUGIN_NAME;
 const CONFIG_PATH = DIR_PATH + "/config.json";
 
@@ -71,12 +71,13 @@ const DEFAULT_CONFIG = {
         "minecraft:witch",
         "minecraft:evoker",
         "minecraft:ravager",
-        "minecraft:allay"
+        "minecraft:allay",
+        "minecraft:leash_knot"
     ],
     limits: {
         enabled: true,
         checkInterval: 30,
-        maxEntities: 100
+        maxEntities: 200
     },
     timer: {
         enabled: true,
@@ -149,6 +150,9 @@ let cleanupCooldownUntil = 0;
 let getTpsApi = null;
 let globalTasks =[];
 
+/**
+ * 核心验证：检测实体是否允许被清理
+ */
 function isCleanable(en) {
     if (!en || en.isPlayer()) return false;
 
@@ -229,6 +233,9 @@ function isCleanable(en) {
     return true;
 }
 
+/**
+ * 触发清理总调度进程
+ */
 function triggerCleanup(reasonStr, precalculatedTargets = null, isManual = false) {
     if (pendingCleanup) return;
     if (!isManual && Date.now() < cleanupCooldownUntil) return;
@@ -269,6 +276,9 @@ function triggerCleanup(reasonStr, precalculatedTargets = null, isManual = false
     pendingCleanup = { taskId: taskId, targets: targets };
 }
 
+/**
+ * 最终行刑：只查杀在触发时刻被收录的实体ID，并在行刑前执行二次校验
+ */
 function executeCleanup(targets) {
     if (pendingCleanup && pendingCleanup.taskId) {
         clearInterval(pendingCleanup.taskId);
@@ -280,8 +290,10 @@ function executeCleanup(targets) {
         try {
             let en = mc.getEntity(id);
             if (en) {
-                en.despawn();
-                successCount++;
+                if (isCleanable(en)) {
+                    en.despawn();
+                    successCount++;
+                }
             }
         } catch (e) {
         }
@@ -292,6 +304,9 @@ function executeCleanup(targets) {
     cleanupCooldownUntil = Date.now() + config.cleanup.safetyLockSeconds * 1000;
 }
 
+/**
+ * 发起玩家投票主干逻辑
+ */
 function startVote(initiator) {
     if (activeVote || pendingCleanup) return;
     
@@ -346,6 +361,9 @@ function endVote(success) {
     }
 }
 
+/**
+ * 发送投票操作表单
+ */
 function sendVoteMenu(player) {
     if (activeVote) {
         let fm = mc.newSimpleForm()
@@ -384,6 +402,9 @@ function sendVoteMenu(player) {
     }
 }
 
+/**
+ * 注册命令集
+ */
 function registerCommands() {
     if (config.vote.enabled) {
         let cmdClean = mc.newCommand("clean", "打开清理实体投票菜单", PermType.Any);
@@ -412,6 +433,9 @@ function registerCommands() {
     }
 }
 
+/**
+ * 装载自动执行与侦测主循环队列
+ */
 function startTasks() {
     if (config.limits.enabled) {
         globalTasks.push(setInterval(() => {
